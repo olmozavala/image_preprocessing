@@ -1,0 +1,6 @@
+.idea
+test_data/output
+output
+config/MainConfig.py
+__pycache__
+*.csv
