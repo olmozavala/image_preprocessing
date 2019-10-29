@@ -16,7 +16,7 @@ conda
 -------
 ```
 conda instal python=3.5
-conda install -c conda-forge pydicom 
+conda install -c conda-forge dicom 
 conda install -c simpleitk simpleitk 
 ```
 Conda  from requirements.txt file (linux)
@@ -29,7 +29,7 @@ pip
 -------
 
 `
-pip3 install --user numpy pydicom pandas 
+pip3 install --user numpy dicom pandas 
 `
 
 RUN

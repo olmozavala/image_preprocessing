@@ -3,7 +3,7 @@ import os
 from os.path import join
 from pandas import DataFrame
 import re
-import pydicom
+import dicom
 from inout.io_common import get_dicom_files_in_folder
 
 
@@ -63,7 +63,7 @@ class DicomDataSummary():
                 else:
                     final_folder_name = join(self._input_folder, c_case, matched_folders[0])
                     all_dicom_files = get_dicom_files_in_folder(final_folder_name)
-                    ds = pydicom.read_file(all_dicom_files[0])  # Reads dataset
+                    ds = dicom.read_file(all_dicom_files[0])  # Reads dataset
                     for c_name, c_key in colums_dic.items():
                         data_sum.loc[c_case][c_name] = eval(F'ds.{c_key}')
                     data_sum.loc[c_case]['Size'] = F'{ds.Rows} x {ds.Columns} x {len(all_dicom_files)}'

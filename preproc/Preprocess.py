@@ -1,5 +1,5 @@
-from imagevisualizer.img_viz.medical import MedicalImageVisualizer
-from imagevisualizer.img_viz.constants import SliceMode
+from img_viz.medical import MedicalImageVisualizer
+from img_viz.constants import SliceMode
 
 from preproc.constants import *
 

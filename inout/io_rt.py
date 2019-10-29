@@ -1,6 +1,6 @@
-import pydicom
-from pydicom import Dataset, DataElement, Sequence
-from pydicom.multival import MultiValue
+import dicom
+from dicom import dataset
+from dicom.multival import MultiValue
 from skimage.draw import polygon
 import inout.io_common as io_com
 import numpy as np
@@ -10,13 +10,11 @@ from os import listdir
 import re
 from preproc.contour_smoothing import getContourMinPosFrom2DMask
 import datetime
-from inout.io_common import get_earliest_mri_from_folder
-
 
 def read_structures(dataset):
     '''
     Reads dicom structures for contours from a Dicom dataset
-    :param dataset:  Dicom dataset from pydicom
+    :param dataset:  Dicom dataset from dicom
     :return: contours dataset
     '''
     rt_dicom_structures = []
@@ -106,7 +104,7 @@ def getCtrAsItk(input_folder, ctr_folder_names, ctr_names, base_img, whole_word=
     lstFilesContour = io_com.get_dicom_files_in_folder(join(input_folder, cont_file))
 
     # ===================== Contours ==================
-    ds = pydicom.read_file(lstFilesContour[0]) # Reads dataset
+    ds = dicom.read_file(lstFilesContour[0]) # Reads dataset
     # Reads all the contours in the folder (they are in a dictionary and the 'contours' key has the values as a list
     rt_structures = read_structures(ds)
 
@@ -142,7 +140,7 @@ def getLatestContourFolder(ctr_folder_names, path_ctrs):
         for cfile in cont_files:
             dicomFiles =[f for f in listdir(join(path_ctrs,cfile)) if f.find('.dcm') != -1 ]
             # Here we are assuming that only one dicom file is present in any RT folder
-            ds = pydicom.read_file(join(path_ctrs,cfile,dicomFiles[0])) # Reads dataset
+            ds = dicom.read_file(join(path_ctrs,cfile,dicomFiles[0])) # Reads dataset
             f_date = np.datetime64( ds.InstanceCreationDate[0:4]+'-'+ \
                            ds.InstanceCreationDate[4:6]+'-'+ \
                            ds.InstanceCreationDate[6:8]+'T'+ \
@@ -173,16 +171,16 @@ def rtDicomFromPreviousFolder(input_folder, ctr_folder_names, ctr_names, base_im
     :return:
     '''
 
-    print('Getting pydicom DataSequence from previous data...')
+    print('Getting dicom DataSequence from previous data...')
 
     # Gets the proper rt_folder to look for contours
     cont_file = getLatestContourFolder(ctr_folder_names, input_folder)
     lstFilesContour = io_com.get_dicom_files_in_folder(join(input_folder, cont_file))
 
     # ===================== Contours ==================
-    ds = pydicom.read_file(lstFilesContour[0]) # Reads original dataset
+    ds = dicom.read_file(lstFilesContour[0]) # Reads original dataset
 
-    final_ROIContourSequence_values = [] # This should be an array of datasets and will be replaced from the original FileDataset
+    final_ROIContourSequence_values = [] # This should be an array of datasets and will be replaced from the original Filedataset
 
     # Iterate over the ROIContourSequences (ak the contours) Type: Sequence
     for new_idx_ctr, c_ctr_name in enumerate(ctr_names):
@@ -230,7 +228,7 @@ def rtDicomFromPreviousFolder(input_folder, ctr_folder_names, ctr_names, base_im
                 tot_ctrs = len(ctr_pts)
                 # Iterate over EACH contour and create a dataset for each of them
                 for idx_ctr in range(tot_ctrs):
-                    cur_contourdata_ds = Dataset() # This is the Contour data for this ContourSequence
+                    cur_contourdata_ds = dataset() # This is the Contour data for this ContourSequence
                     # Copy the desired values from the OLD ContourSequence
                     cur_contourdata_ds.ContourGeometricType = old_ContourSequence_ds.ContourGeometricType
 
@@ -254,10 +252,10 @@ def rtDicomFromPreviousFolder(input_folder, ctr_folder_names, ctr_names, base_im
                         contourdata_values.append(phys_pos[2])
 
                     # Copy the list of physical positions in the variable ContourData of the dataset
-                    cur_contourdata_ds.ContourData = MultiValue(pydicom.valuerep.DSfloat, contourdata_values)
+                    cur_contourdata_ds.ContourData = MultiValue(dicom.valuerep.DSfloat, contourdata_values)
                     cur_contourdata_ds.NumberOfContourPoints = tot_pts
 
-                    # Append this Dataset into the list of slices with date
+                    # Append this dataset into the list of slices with date
                     cur_ContourSequence_values.append(cur_contourdata_ds)
 
             old_ROIContour_ds.ContourSequence = Sequence(cur_ContourSequence_values)  # Replace the desired sequence with the new values
@@ -268,4 +266,4 @@ def rtDicomFromPreviousFolder(input_folder, ctr_folder_names, ctr_names, base_im
     new_ROIContourSequence = Sequence(final_ROIContourSequence_values)
     ds.ROIContourSequence = new_ROIContourSequence # Replace old ROIContourSequence with new one
 
-    pydicom.dcmwrite(output_file_name, ds)
+    dicom.dcmwrite(output_file_name, ds)

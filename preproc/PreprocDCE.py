@@ -1,4 +1,4 @@
-import pydicom
+import dicom
 import SimpleITK as sitk
 from os.path import join
 import os
@@ -9,7 +9,7 @@ def getDimensionsDCE(file):
     :param file:
     :return:
     '''
-    dataset = pydicom.dcmread(file)
+    dataset = dicom.dcmread(file)
     rows = int(dataset.Rows)
     cols = int(dataset.Columns)
     total_times = dataset.NumberOfTemporalPositions
@@ -30,7 +30,7 @@ def getDimensions(file):
     :param file:
     :return:
     '''
-    dataset = pydicom.dcmread(file)
+    dataset = dicom.dcmread(file)
     rows = int(dataset.Rows)
     cols = int(dataset.Columns)
     c_time =dataset.AcquisitionNumber
@@ -69,7 +69,7 @@ def preprocDCE(root_input_folder, output_folder, norm_dce):
         print('\t Reading data....')
         for file in files:
             filename = join(input_folder,file)
-            dataset = pydicom.dcmread(filename)
+            dataset = dicom.dcmread(filename)
             c_time = int(np.floor((dataset.InstanceNumber - 1)/slices_per_image))  # We start index at 0 not at 1
             slice = dataset.InStackPositionNumber - 3  # We start index at 0 not at 1 TODO verify -3 works for all of them (it doesn't make sense)
             # print(F'OUR: {c_time} - {slice}     ORIGINAL: {dataset.InstanceNumber} - {dataset.InStackPositionNumber}')
@@ -112,7 +112,7 @@ def preprocDCE(root_input_folder, output_folder, norm_dce):
 
             for c_dcm_file in dcm_files:
                 filename = join(root_input_folder,c_time_folder,c_dcm_file)
-                dataset = pydicom.dcmread(filename)
+                dataset = dicom.dcmread(filename)
                 slice = dataset.InstanceNumber - 1  # We start index at 0 not at 1
                 # print(F'OUR: {slice}     ORIGINAL: {dataset.InstanceNumber} ')
                 all_images[slice,:,:,c_time-1] = dataset.pixel_array

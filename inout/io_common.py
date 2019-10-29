@@ -3,7 +3,7 @@ from os import walk, listdir
 from os.path import join
 
 import numpy as np
-import pydicom
+import dicom
 import SimpleITK as sitk
 
 
@@ -23,6 +23,7 @@ def get_dicom_files_in_folder(input_folder):
                 list_of_files.append(join(dirName, filename))
 
     return list_of_files
+
 
 def write_itk_imgs(output_folder, pretxt, imgs, img_names):
     """
@@ -67,7 +68,7 @@ def get_earliest_mri_from_folder(mri_series_name, input_foler):
             for cfile in mri_series_files:
                 dicomFiles =[f for f in listdir(join(input_foler,cfile)) if f.find('.dcm') != -1 ]
                 # Here we are using the first mri_series
-                ds = pydicom.read_file(join(input_foler,cfile,dicomFiles[0])) # Reads structure
+                ds = dicom.read_file(join(input_foler,cfile,dicomFiles[0])) # Reads structure
                 try:
                     f_date = np.datetime64( ds.AcquisitionDate[0:4]+'-'+ \
                                    ds.AcquisitionDate[4:6]+'-'+ \
@@ -91,5 +92,6 @@ def get_earliest_mri_from_folder(mri_series_name, input_foler):
 def get_dicom_header(folder):
     '''Gets the dicom header from a folder'''
     list_of_files = listdir(folder)
-    RefDs = pydicom.read_file(join(folder,list_of_files[0]))
+    RefDs = dicom.read_file(join(folder,list_of_files[0]))
     return RefDs, len(list_of_files)-2
+

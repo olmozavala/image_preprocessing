@@ -48,3 +48,7 @@ class PreprocParams(Enum):
     cases_to_process = 9  # An np array with the cases to process
     compute_roi_from_intersection = 10  # IN this case a ROI is obtained by intersecting the first 3 images
     keep_ctr_name = 11  # Its used to keep the name of the ctr from its original rt structure name
+
+class NormParams(Enum):
+    """Contains the parameters for a 1D normalization"""
+    min_max =1
